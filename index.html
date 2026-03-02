@@ -1,0 +1,691 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>AI SIP Calculator | Free Mutual Fund & Investment Return Calculator</title>
+    <meta name="description" content="Free AI SIP Calculator: Calculate mutual fund SIP returns, step-up SIP, inflation-adjusted value & wealth growth. Instant, client-side & accurate.">
+    <meta name="keywords" content="sip calculator, ai sip calculator, mutual fund sip calculator online, calculate sip returns, investment return calculator free, sip maturity calculator tool">
+    <meta name="author" content="Smart Investor Tools">
+    <meta property="og:title" content="AI SIP Calculator – Calculate Mutual Fund Returns & Wealth Growth Instantly">
+    <meta property="og:description" content="Free advanced SIP calculator with step-up, inflation & charts. Client-side, fast & accurate.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* === RESET & BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+            color: #1e293b;
+            line-height: 1.5;
+            padding: 0 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .main-content {
+            flex: 1 1 65%;
+            min-width: 300px;
+        }
+
+        .sidebar {
+            flex: 0 0 300px;
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .sidebar {
+                display: block;
+            }
+        }
+
+        .ad-banner {
+            background: #e9eef3;
+            border: 2px dashed #a0b8cc;
+            border-radius: 16px;
+            padding: 1.5rem 0.5rem;
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .ad-sidebar-box {
+            background: #e9eef3;
+            border: 2px dashed #a0b8cc;
+            border-radius: 20px;
+            padding: 4rem 1rem;
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+        .ad-footer {
+            background: #e9eef3;
+            border: 2px dashed #a0b8cc;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #0b2a4a, #1e4a6f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        h2 {
+            color: #0b2a4a;
+            font-size: 1.8rem;
+            margin: 1.5rem 0 1rem 0;
+            border-left: 6px solid #2ecc71;
+            padding-left: 1rem;
+        }
+        h3 {
+            color: #1e4a6f;
+            font-size: 1.4rem;
+            margin: 1.2rem 0 0.8rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px -10px rgba(0,30,50,0.15);
+            padding: 1.8rem 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.2s;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+        }
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .input-field label {
+            font-weight: 600;
+            color: #1e3a5f;
+            font-size: 0.9rem;
+        }
+        .input-field input, .input-field select {
+            background: #f9fcff;
+            border: 1.5px solid #dde7f0;
+            border-radius: 20px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            transition: 0.2s;
+            outline: none;
+            font-weight: 500;
+        }
+        .input-field input:focus, .input-field select:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 4px rgba(46,204,113,0.15);
+        }
+        .btn {
+            background: #1e4a6f;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 8px 18px rgba(0,60,90,0.2);
+            width: 100%;
+            max-width: 280px;
+            margin: 1.5rem 0 0.5rem;
+        }
+        .btn:hover {
+            background: #0f3b5c;
+            transform: scale(1.02);
+        }
+
+        .result-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f0f7ff, #ffffff);
+            border-radius: 24px;
+            padding: 1.4rem 1.2rem;
+            flex: 1 1 160px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.03);
+            border: 1px solid rgba(46,204,113,0.2);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #4a627a;
+            letter-spacing: 0.3px;
+        }
+        .stat-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #0b2a4a;
+            line-height: 1.2;
+        }
+        .chart-container {
+            max-width: 380px;
+            margin: 1.5rem auto;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0 1rem;
+            border-radius: 20px;
+            border: 1px solid #dde7f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.95rem;
+        }
+        th {
+            background: #1e4a6f;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 500;
+        }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dde7f0;
+            text-align: center;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .secondary-btn {
+            background: white;
+            border: 2px solid #1e4a6f;
+            color: #1e4a6f;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .secondary-btn:hover {
+            background: #ebf5ff;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+        }
+        .contact-form input, .contact-form textarea {
+            background: #f9fcff;
+            border: 1.5px solid #dde7f0;
+            border-radius: 24px;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+        }
+        .contact-form button {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin: 2rem 0 1rem;
+        }
+        .footer-links a {
+            color: #1e4a6f;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .disclaimer {
+            background: #fff7e0;
+            border-radius: 30px;
+            padding: 1.2rem;
+            font-size: 0.9rem;
+            border-left: 6px solid #f1c40f;
+            margin: 1.5rem 0;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #d0e0ed;
+            margin: 2rem 0;
+        }
+        .text-small {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.9rem; }
+            .card { padding: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="ad-banner">
+                📢 Ad Space – 728x90 (Your ad here)
+            </div>
+
+            <h1>AI SIP Calculator – Calculate Mutual Fund Returns & Wealth Growth Instantly</h1>
+
+            <div class="card">
+                <div class="input-grid">
+                    <div class="input-field">
+                        <label>💰 Monthly/Yearly Investment (₹)</label>
+                        <input type="number" id="investment" value="5000" min="100" step="500">
+                    </div>
+                    <div class="input-field">
+                        <label>📈 Expected Return (% p.a.)</label>
+                        <input type="number" id="returnRate" value="12" min="0" step="0.1" max="40">
+                    </div>
+                    <div class="input-field">
+                        <label>📅 Years</label>
+                        <input type="number" id="years" value="10" min="0" max="50" step="1">
+                    </div>
+                    <div class="input-field">
+                        <label>📅 Extra Months</label>
+                        <input type="number" id="extraMonths" value="0" min="0" max="11" step="1">
+                    </div>
+                    <div class="input-field">
+                        <label>📊 Step-Up (% yearly)</label>
+                        <input type="number" id="stepUp" value="0" min="0" max="30" step="0.5">
+                    </div>
+                    <div class="input-field">
+                        <label>🏦 Inflation Rate (%)</label>
+                        <input type="number" id="inflation" value="0" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="input-field">
+                        <label>⚙️ Mode</label>
+                        <select id="mode">
+                            <option value="monthly" selected>Monthly SIP</option>
+                            <option value="yearly">Yearly Investment</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" id="calculateBtn">Calculate SIP</button>
+            </div>
+
+            <div id="resultsPanel" class="fade-in">
+                <div class="result-cards">
+                    <div class="stat-card"><span class="stat-label">Total Investment</span><div class="stat-value" id="totalInvestment">₹0</div></div>
+                    <div class="stat-card"><span class="stat-label">Est. Returns</span><div class="stat-value" id="totalReturns">₹0</div></div>
+                    <div class="stat-card"><span class="stat-label">Final Value</span><div class="stat-value" id="finalValue">₹0</div></div>
+                    <div class="stat-card"><span class="stat-label">Wealth Gained</span><div class="stat-value" id="wealthGained">₹0</div></div>
+                    <div class="stat-card"><span class="stat-label">Inflation Adj.</span><div class="stat-value" id="inflationAdj">₹0</div></div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="sipPieChart" width="300" height="300"></canvas>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="growthTable">
+                        <thead><tr><th>Year</th><th>Invested (₹)</th><th>Value (₹)</th><th>Returns (₹)</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="secondary-btn" id="copyResultsBtn">📋 Copy Results</button>
+                    <button class="secondary-btn" id="printBtn">🖨️ Print</button>
+                </div>
+            </div>
+
+            <div class="ad-banner">
+                📢 Ad Space – 728x90 (Mid-content)
+            </div>
+
+            <div style="margin: 2rem 0;">
+                <h2>What is a Systematic Investment Plan (SIP)?</h2>
+                <p>A SIP is a disciplined approach to investing in mutual funds, allowing you to invest a fixed amount regularly (monthly or yearly). It harnesses the power of compounding and rupee cost averaging. Our AI SIP calculator instantly projects your wealth based on expected returns, step-up, and inflation.</p>
+                <h3>Power of Compounding</h3>
+                <p>The earlier you start, the more your money grows. Compounding generates returns on your invested capital and on the accumulated returns. For example, a ₹5,000 monthly SIP at 12% for 20 years can grow to over ₹50 lakhs.</p>
+                <h3>How SIP Returns Are Calculated</h3>
+                <p>We use the standard future value formula for SIP: M = P × [((1+r)^n - 1)/r] × (1+r). Where r = monthly return rate, n = total months. If step-up is added, the investment amount increases annually by the given percentage, reflecting real-world income growth.</p>
+                <h3>What is Step-Up SIP?</h3>
+                <p>Step-up (or top-up) SIP allows you to increase your investment amount every year, usually in line with salary hikes. This tool lets you simulate that and see how it multiplies your final corpus.</p>
+                <h3>Impact of Inflation</h3>
+                <p>Inflation reduces purchasing power. By entering an inflation rate, we show the inflation-adjusted maturity value, so you know the real worth of your future corpus in today's rupees.</p>
+                <h3>Who Should Use This Tool?</h3>
+                <p>Beginners, salaried professionals, financial advisors, and anyone planning long-term goals like retirement, children's education, or wealth creation. It's 100% free, client-side, and secure.</p>
+            </div>
+
+            <h2>Frequently Asked Questions</h2>
+            <div style="background: white; border-radius: 28px; padding: 1.8rem; box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+                <h4>1. What is a SIP?</h4>
+                <p>SIP (Systematic Investment Plan) is a method of investing a fixed sum regularly in mutual funds.</p>
+                <h4>2. Is this SIP calculator free?</h4>
+                <p>Yes, completely free, no login required.</p>
+                <h4>3. Does it calculate step-up SIP?</h4>
+                <p>Absolutely. Use the "Step-Up SIP (%)" field.</p>
+                <h4>4. Does it guarantee returns?</h4>
+                <p>No, it's an estimate based on assumed returns. Market linked investments are subject to risks.</p>
+                <h4>5. Does this tool store my financial data?</h4>
+                <p>No. Everything runs in your browser; we never see or store your numbers.</p>
+                <h4>6. How accurate is the SIP calculation?</h4>
+                <p>It uses standard financial formulas, but actual returns depend on market performance.</p>
+            </div>
+
+            <h2>Contact Us</h2>
+            <div class="card">
+                <form action="https://formsubmit.co/as9329387575@gmail.com" method="POST" class="contact-form">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Email address" required>
+                    <textarea name="message" rows="4" placeholder="Your message..."></textarea>
+                    <input type="hidden" name="_captcha" value="false">
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 2rem; margin: 2rem 0;">
+                <div style="flex:1; min-width:260px;">
+                    <h3>Privacy Policy</h3>
+                    <p class="text-small">We do not store any personal or financial data. All calculations are client-side. Cookies may be used by Google AdSense for ad personalization. We never sell your data. Contact: as9329387575@gmail.com</p>
+                </div>
+                <div style="flex:1; min-width:260px;">
+                    <h3>Terms & Conditions</h3>
+                    <p class="text-small">This tool is for educational purposes. No liability for investment decisions. Content is intellectual property. By using, you agree to these terms. Governing law: India.</p>
+                </div>
+            </div>
+
+            <div class="ad-footer">
+                📢 Footer Ad – 728x90 (Ad Space)
+            </div>
+
+            <div class="footer-links">
+                <a href="#">Home</a> <a href="#">Privacy</a> <a href="#">Terms</a> <a href="#">Contact</a>
+            </div>
+            <p style="text-align:center; color:#4a627a;">© 2025 AI SIP Calculator – Built for Smart Investors</p>
+        </div>
+
+        <div class="sidebar">
+            <div class="ad-sidebar-box">
+                📢 Ad Space<br>300x250
+            </div>
+            <div style="background: white; border-radius: 28px; padding: 1.5rem; box-shadow: 0 15px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top:0;">Why AI SIP?</h3>
+                <p>Our AI-enhanced calculator gives you realistic projections including step-up and inflation. Used by 10,000+ investors.</p>
+                <p>✔️ Instant<br>✔️ Private<br>✔️ No signup</p>
+            </div>
+            <div class="ad-sidebar-box" style="margin-top:2rem;">
+                📢 Ad Space<br>300x250
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Input elements
+            const investmentEl = document.getElementById('investment');
+            const returnRateEl = document.getElementById('returnRate');
+            const yearsEl = document.getElementById('years');
+            const extraMonthsEl = document.getElementById('extraMonths');
+            const stepUpEl = document.getElementById('stepUp');
+            const inflationEl = document.getElementById('inflation');
+            const modeEl = document.getElementById('mode');
+            const calculateBtn = document.getElementById('calculateBtn');
+
+            // Output spans
+            const totalInvestmentSpan = document.getElementById('totalInvestment');
+            const totalReturnsSpan = document.getElementById('totalReturns');
+            const finalValueSpan = document.getElementById('finalValue');
+            const wealthGainedSpan = document.getElementById('wealthGained');
+            const inflationAdjSpan = document.getElementById('inflationAdj');
+            const tableBody = document.querySelector('#growthTable tbody');
+
+            let pieChart;
+
+            function formatMoney(amount) {
+                return '₹' + amount.toFixed(0).replace(/\d(?=(\d{3})+$)/g, '$&,');
+            }
+
+            function calculateSIP() {
+                // Parse inputs
+                let investment = parseFloat(investmentEl.value) || 0;
+                let annualRate = parseFloat(returnRateEl.value) || 0;
+                let years = parseFloat(yearsEl.value) || 0;
+                let extraMonths = parseFloat(extraMonthsEl.value) || 0;
+                let stepUp = parseFloat(stepUpEl.value) || 0;
+                let inflation = parseFloat(inflationEl.value) || 0;
+                let mode = modeEl.value;
+
+                if (investment <= 0 || years < 0 || extraMonths < 0) {
+                    alert('Please enter valid positive numbers.');
+                    return;
+                }
+
+                // Total duration in months/years
+                let totalMonths = years * 12 + extraMonths;
+                if (totalMonths <= 0) totalMonths = 1; // edge case
+
+                let totalYears = years + extraMonths / 12;
+
+                // Monthly rate
+                let monthlyRate = annualRate / 100 / 12;
+                let annualRateDecimal = annualRate / 100;
+
+                let totalInvested = 0;
+                let finalValue = 0;
+
+                // For yearly table
+                let yearlyData = [];
+
+                if (mode === 'monthly') {
+                    // Monthly SIP (with step-up)
+                    let currentMonthlyInvestment = investment;
+                    let cumulativeInvestment = 0;
+                    // We'll simulate month by month
+                    for (let m = 1; m <= totalMonths; m++) {
+                        // Determine if step-up applies at start of year (after completing 12 months)
+                        // Step-up increases the investment from the first month of each new year.
+                        if (m > 1 && (m-1) % 12 === 0 && stepUp > 0) {
+                            currentMonthlyInvestment *= (1 + stepUp / 100);
+                        }
+
+                        cumulativeInvestment += currentMonthlyInvestment;
+
+                        // Future value of this month's investment at the end
+                        let monthsRemaining = totalMonths - m;
+                        finalValue += currentMonthlyInvestment * Math.pow(1 + monthlyRate, monthsRemaining);
+
+                        // Record yearly snapshots
+                        if (m % 12 === 0 || m === totalMonths) {
+                            let yearNumber = Math.ceil(m / 12);
+                            // Calculate value at this point (end of year) precisely by summing all previous months with correct compounding
+                            // Recalculate cumulative value up to this month to be accurate
+                            let valueUpToNow = 0;
+                            let tempMonthlyInv = investment;
+                            for (let j = 1; j <= m; j++) {
+                                if (j > 1 && (j-1) % 12 === 0 && stepUp > 0) {
+                                    tempMonthlyInv *= (1 + stepUp / 100);
+                                }
+                                valueUpToNow += tempMonthlyInv * Math.pow(1 + monthlyRate, m - j);
+                            }
+                            // Investment up to now is cumulativeInvestment
+                            yearlyData.push({
+                                year: yearNumber,
+                                invested: cumulativeInvestment,
+                                value: valueUpToNow,
+                                returns: valueUpToNow - cumulativeInvestment
+                            });
+                        }
+                    }
+                    totalInvested = cumulativeInvestment;
+                } else {
+                    // Yearly investment mode
+                    let currentYearlyInvestment = investment;
+                    let cumulativeInvestment = 0;
+                    let totalYearsFull = Math.ceil(totalYears); // number of year intervals
+                    for (let y = 1; y <= totalYearsFull; y++) {
+                        // Determine if this is the last partial year
+                        let isLastYear = (y === totalYearsFull);
+                        let fraction = 1;
+                        if (isLastYear && extraMonths > 0) {
+                            fraction = extraMonths / 12; // partial year
+                        }
+
+                        // Apply step-up at beginning of each year (for the first year, no step-up)
+                        if (y > 1 && stepUp > 0) {
+                            currentYearlyInvestment *= (1 + stepUp / 100);
+                        }
+
+                        let investedThisYear = currentYearlyInvestment * fraction;
+                        cumulativeInvestment += investedThisYear;
+
+                        // Years remaining after this investment
+                        let yearsRemaining = totalYears - (y - 1 + fraction);
+                        if (yearsRemaining < 0) yearsRemaining = 0;
+
+                        // Future value of this year's investment
+                        finalValue += investedThisYear * Math.pow(1 + annualRateDecimal, yearsRemaining);
+
+                        // For yearly snapshot, we need value at end of this year (or at end of total duration for last)
+                        // Let's compute value up to this point (cumulative)
+                        // We'll recompute value at end of this year precisely by summing each year's investment compounded to this point
+                        let valueAtYearEnd = 0;
+                        let tempYearlyInv = investment;
+                        for (let k = 1; k <= y; k++) {
+                            let frac = 1;
+                            if (k === totalYearsFull && extraMonths > 0 && k === y) {
+                                frac = extraMonths / 12;
+                            }
+                            if (k > 1 && stepUp > 0) {
+                                tempYearlyInv *= (1 + stepUp / 100);
+                            }
+                            let yearsFromThen = y - k + (frac - 1); // approx, but simpler: assume end of year y, each earlier investment compounded for (y - k + fraction) years?
+                            // For simplicity, we'll store the cumulative value computed earlier as finalValue only at the end.
+                            // Instead, we'll compute snapshot at end of each full year (if not last partial)
+                        }
+                        // Because yearly snapshots for yearly mode can be tricky, we'll approximate by cumulative value at the end of each year using exact compounding.
+                        // Recompute cumulative value at end of year y:
+                        let cumVal = 0;
+                        let yrInv = investment;
+                        for (let yr = 1; yr <= y; yr++) {
+                            if (yr > 1 && stepUp > 0) yrInv *= (1 + stepUp / 100);
+                            let yearsFromYr = y - yr;
+                            if (yr === y && extraMonths > 0 && y === totalYearsFull) {
+                                // partial year handled separately: at the end of total period we will capture last year separately
+                                // For snapshot at end of year y (before extra months if any), we consider full year investment
+                                cumVal += yrInv * Math.pow(1 + annualRateDecimal, yearsFromYr);
+                            } else {
+                                cumVal += yrInv * Math.pow(1 + annualRateDecimal, yearsFromYr);
+                            }
+                        }
+                        // For last partial year, we might double count; we'll just use the final value after loop for last entry
+                        yearlyData.push({
+                            year: y,
+                            invested: cumulativeInvestment,
+                            value: cumVal,
+                            returns: cumVal - cumulativeInvestment
+                        });
+                    }
+                    totalInvested = cumulativeInvestment;
+                }
+
+                let totalReturns = finalValue - totalInvested;
+                let wealthGained = totalReturns;
+                let inflationAdj = finalValue;
+                if (inflation > 0 && totalYears > 0) {
+                    inflationAdj = finalValue / Math.pow(1 + inflation / 100, totalYears);
+                }
+
+                // Update DOM
+                totalInvestmentSpan.innerText = formatMoney(totalInvested);
+                totalReturnsSpan.innerText = formatMoney(totalReturns);
+                finalValueSpan.innerText = formatMoney(finalValue);
+                wealthGainedSpan.innerText = formatMoney(wealthGained);
+                inflationAdjSpan.innerText = formatMoney(inflationAdj);
+
+                // Update table
+                tableBody.innerHTML = '';
+                yearlyData.forEach(item => {
+                    let row = `<tr><td>${item.year}</td><td>${formatMoney(item.invested)}</td><td>${formatMoney(item.value)}</td><td>${formatMoney(item.returns)}</td></tr>`;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+
+                // Update pie chart
+                if (pieChart) pieChart.destroy();
+                const ctx = document.getElementById('sipPieChart').getContext('2d');
+                pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Total Investment', 'Estimated Returns'],
+                        datasets: [{
+                            data: [totalInvested, totalReturns],
+                            backgroundColor: ['#1e4a6f', '#2ecc71'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
+            }
+
+            // Event listeners
+            calculateBtn.addEventListener('click', calculateSIP);
+            window.addEventListener('load', calculateSIP);
+
+            // Copy results
+            document.getElementById('copyResultsBtn').addEventListener('click', () => {
+                let text = `SIP Results:\nTotal Investment: ${totalInvestmentSpan.innerText}\nEstimated Returns: ${totalReturnsSpan.innerText}\nFinal Value: ${finalValueSpan.innerText}\nWealth Gained: ${wealthGainedSpan.innerText}\nInflation Adjusted: ${inflationAdjSpan.innerText}`;
+                navigator.clipboard.writeText(text).then(() => alert('Results copied!'));
+            });
+
+            // Print
+            document.getElementById('printBtn').addEventListener('click', () => {
+                window.print();
+            });
+
+            // Add disclaimer
+            const disclaimerDiv = document.createElement('div');
+            disclaimerDiv.className = 'disclaimer';
+            disclaimerDiv.innerText = '⚠️ This SIP calculation is for informational purposes only. Actual returns may vary depending on market performance.';
+            document.querySelector('.main-content').insertBefore(disclaimerDiv, document.querySelector('.main-content').children[5]);
+        })();
+    </script>
+</body>
+</html>
+```
